@@ -26,7 +26,9 @@ function getheader($name) {
   if (isset($_SERVER['REDIRECT_HTTP_'.$upper]) && $_SERVER['REDIRECT_HTTP_'.$upper] != null) {
     return $_SERVER['REDIRECT_HTTP_'.$upper];
   }
-  $apache = apache_request_headers();
+  if(function_exists("apache_request_headers")) {
+    $apache = apache_request_headers();
+  }
   if (isset($apache) && $apache != null) {
     if (isset($apache) && $apache != null && isset($apache[$name]) && $apache[$name] != null) {
       return $apache[$name];

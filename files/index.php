@@ -85,7 +85,7 @@ function post() {
     $meta_content = json_encode($obj, $json_encode_props)."\n";
     file_put_contents($metafile, $meta_content);
     header('Content-Type: application/json');
-    header('Content-Length: '.strlen($output));
+    header('Content-Length: '.strlen($meta_content));
     header('X-Max-Length-Supported: '.$maxsizesupported);
     header('X-File-Id: '.$fileid);
     header('X-Download: 0');
