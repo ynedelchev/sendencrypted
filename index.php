@@ -225,20 +225,27 @@ function crypt(blob) {
       start(controller) {
         return pump();
         function pump() {
-          return readr.read().then(({ done, value }) => {
+          return reader.read().then(({ done, value }) => {
             if (value != null) {
-              decipher.update(value);
-              var bytes = cipher.output.getBytes();
-console.log("Encrypted Bytes Current: " + JSON.stringify(bytes));
+              cipher.update(forge.util.createBuffer(value));
+              var str = cipher.output.getBytes();
+              var bytes = new Uint8Array(str.length);
+              for (var i =0; i < str.length; i++) {
+                bytes[i] = str.charCodeAt(i) & 0x0FF;
+              }
               controller.enqueue(bytes);
             }
             if (done) {
-                cipher.finish();
-                var bytes = cipher.output.getBytes();
-console.log("Encrypted Bytes Last: " + JSON.stringify(bytes));
-                controller.enqueue(bytes);
-                controller.close();
-                return;
+console.log("value: " + value);
+              cipher.finish();
+              var str = cipher.output.getBytes();
+              var bytes = new Uint8Array(str.length);
+              for (var i =0; i < str.length; i++) {
+                bytes[i] = str.charCodeAt(i) & 0x0FF;
+              }
+              controller.enqueue(bytes);
+              controller.close();
+              return;
             }
             return pump();
           });
@@ -247,7 +254,7 @@ console.log("Encrypted Bytes Last: " + JSON.stringify(bytes));
       pull(controller) {
         console.log("pull called.");
       },
-      concel(reason) {
+      cancel(reason) {
         console.log("Cancelled, because: " + reason);
       }
     },
@@ -260,6 +267,7 @@ console.log("Chunk: " + chunk);
     }
   );
   var response = new Response(stream);
+  var promise = response.blob();
   promise.catch(function (ex) {
     console.log("Converting to blob failed with exception: " + ex + " : " + JSON.stringify(ex));
   });
@@ -269,7 +277,7 @@ console.log("Chunk: " + chunk);
       uploadBlob(blob, btoa(iv + "" + key));
     },
     function (error) {
-      console.log("Gettinf blob failed: " + JSON.stringify(error, null, 2));
+      console.log("Getting blob failed: " + JSON.stringify(error, null, 2));
     }
   );
 }
@@ -318,7 +326,7 @@ function uploadBlob(blob, secret) {
 	id = result["id"];
   console.log("id: " + JSON.stringify(id));
       } catch (se) {
-        console.log("Невъзможност за привеждане на отговора към джаваскрипт формат JSONC. Отговор: " + this.responseText + "; Име: " + se.name + "; Съобщение: " + se.message+ "; Стек: " + se.stack + "; " + JSON.stringify(se));
+        console.log("Невъзможност за привеждане на отговора към джаваскрипт формат JSON. Отговор: " + this.responseText + "; Име: " + se.name + "; Съобщение: " + se.message+ "; Стек: " + se.stack + "; " + JSON.stringify(se));
       }	
       link.innerHTML = url + "" + id + "#" + secret; 
       link.style.display = "inline-block";
@@ -348,8 +356,8 @@ function copyToClipboard(str) {
   document.body.appendChild(el);                  // Append the <textarea> element to the HTML document
   const selected =            
     document.getSelection().rangeCount > 0        // Check if there is any content selected previously
-    ? document.getSelection().getRangeAt(0)     // Store selection if found
-    : false;                                    // Mark as false to know no selection existed before
+    ? document.getSelection().getRangeAt(0)       // Store selection if found
+    : false;                                      // Mark as false to know no selection existed before
   el.select();                                    // Select the <textarea> content
   document.execCommand('copy');                   // Copy - only works as a result of a user action (e.g. click events)
   document.body.removeChild(el);                  // Remove the <textarea> element
@@ -476,6 +484,7 @@ var stream = new ReadableStream(
 );
 
 //readStream(stream);
+/*
 
 var b = new Blob(["test", "-", "mest"], {type: "text/plain"});
 var readr = b.stream().getReader();
@@ -545,7 +554,6 @@ promise.then(
     }
   }
 );
-/*
 
 var reader = stream.getReader();
 console.log("reader: " + reader);
