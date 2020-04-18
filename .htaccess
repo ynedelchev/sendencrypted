@@ -42,7 +42,8 @@ RewriteCond %{REQUEST_URI} ^.*/?files/([^/]+)$
 RewriteRule "^.*/?files/([^/]+)$" files/elements.php [E=ELEMENT:$1,L,QSA,END] 
 
 RewriteCond %{REQUEST_URI} ^(?!(/?files$|/?files/$|/?files/.*$|files/.+$))(/?.*)$
-#RewriteCond %{DOCUMENT_ROOT}/%1 -d
+RewriteCond %{DOCUMENT_ROOT}/%1 !-f
+RewriteCond %{DOCUMENT_ROOT}/%1 !-d
 RewriteRule "^(.*)/?$" index.php [L,QSA,END] 
 
 

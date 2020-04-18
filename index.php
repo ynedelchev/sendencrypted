@@ -290,11 +290,14 @@ function uploadBlob(blob, secret) {
   http.open("POST", url, true);
   http.onreadystatechange = 
     function () {
-      var state = "Unknown";
+      var state = "";
       switch (this.readyState) {
-        case 0: state = "Неустановена връзка";      break; case 1: state = "Връзката е отворена";  break; 
-        case 2: state = "Получени заглавни части";  break; case 3: state = "Зареждане";            break;  
-        case XMLHttpRequest.DONE: state = "Готово"; break;
+        case XMLHttpRequest.UNSENT:           state = "Неустановена връзка";     break;  
+        case XMLHttpRequest.OPENED:           state = "Връзката е отворена";     break;
+        case XMLHttpRequest.HEADERS_RECEIVED: state = "Получени заглавни части"; break;  
+        case XMLHttpRequest.LOADING:          state = "Зареждане";               break;
+        case XMLHttpRequest.DONE:             state = "Готово";                  break;
+        default:                              state = "Неизвестно състояние: " + state;
       };
       console.log("Качване на файл: " + state + " ... ");
       if (this.readyState != XMLHttpRequest.DONE) {
@@ -568,102 +571,19 @@ promise.then(function (result) {
 //URL.revokeObjectURL(link.href);
 
 </script>
-<style>
- body {
-  background-color: #A69373;
- }
- div.main {
-   margin: auto; 
-   width: 700px;
-   max-width: 700px;
-   display: block; 
-   border: 1px solid rgb(127, 119, 77); 
-   background-color: rgb(251, 233, 207); 
-   border-radius: 1em; 
-   padding-left: 3em; 
-   padding-right: 3em;
-   padding-top:   2em;
-   padding-bottom: 2em;
-   box-shadow: 3px 3px 5px #444;
- }
- h1.headerline {
-   color: rgb(151, 133, 107); 
-   text-shadow: 2px 5px 7px white;
- }
- div.label {
-   float:left; 
-   padding-right: 2em; 
-   min-width:  12em; 
-   text-align: left;
-   margin-right: 1em;
- }
- div.drag {
-   #border: 2px dashed rgb(187, 187, 187);
-   float: left;
-   padding: 2em;
-   border: 2px dashed rgb(187, 187, 187);
- }
- input[type="file"].browse {
-    color: transparent;
-    font-size: 12pt;
- }
- input.crypt {
-   height: 3em;
-   width:  10em;
-   display: inline-block;
-   text-align: center;
-   text-decoration: none;
-   cursor: pointer;
-   padding: 4px;
-   border: solid 1px rgb(153, 144, 109);
-   border-radius: 5px;
-   box-shadow: 0px 0px 10px rgb(204, 204, 204);
- }
- div.error {
-   margin: auto; 
-   display: none; 
-   border: 1px solid rgb(255, 19, 77); 
-   background-color: rgb(255, 173, 147); 
-   border-radius: 0.5em; 
-   padding: 1em; 
-   align: center; 
-   text-align: center"
- }
- div.progresscontainer {
-   position: relative; 
-   width: 400px; 
-   height: 1em; 
-   float: left;
-   border: 1px solid lightgray;
- }
- div.progressbase {
-   position: absolute; 
-   background-color: white; 
-   width: 400px;
- }
- div.actprogress {
-   position: absolute; 
-   background-color: lightblue;  
-   width:   0px; 
-   white-space: nowrap; 
-   text-shadow: 1px 1px white; 
-   text-align: left;
- }
- a.link {
-   display: inline-block; 
-   border: 2px dashed lightgray; 
-   min-height: 2em; 
-   color: rgb(200, 180, 177); 
-   clear: both; 
-   margin-bottom: 3px; 
-   margin-top: 3px; 
-   width: 650px; 
-   text-decoration: none;
-   word-wrap: break-word;
- }
-</style>
+<link rel="stylesheet" type="text/css" href="general.css">
 </head>
 <body onload="onpageload();">
+<!-- Fork Me On Github -->
+<img style="position: absolute; top: 0; right: 0; border: 0;"
+     src="images/fork-me-on-github.png"
+     alt="Fork me on GitHub" usemap="#github">
+  <map name="github">
+    <area shape="poly" coords="12,0,148,138,148,74,74,0,12,0" 
+          href="https://github.com/ynedelchev/sendencrypted" 
+          alt="sendencrypted">
+  </map>
+<!-- Fork Me On Github End -->
 
   <div class="main">
     <div class="error" id="error">
@@ -672,7 +592,7 @@ promise.then(function (result) {
 
     <h1 class="headerline">Изпращане на криптирани файлове</h1>
 
-    <div style="float: left;">0 bytes &nbsp;</div>
+    <div style="float: left;">0 байта &nbsp;</div>
     <div id="sizebox" class="progresscontainer">
       <div id="maxsize" class="progressbase"> &nbsp; </div>
       <div id="actsize" class="actprogress"> &nbsp; </div>

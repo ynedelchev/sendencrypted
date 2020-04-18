@@ -2,6 +2,22 @@
 require_once(dirname(__DIR__)."/maxsize.php");
 $json_encode_props = JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PARTIAL_OUTPUT_ON_ERROR;
 
+
+function full_url($up)
+{
+  $ssl      = ( ! empty( $_SERVER['HTTPS'] ) && $_SERVER['HTTPS'] == 'on' );
+  $s = empty($_SERVER["HTTPS"]) ? '' : ($_SERVER["HTTPS"] == "on") ? "s" : "";
+  $protocol = substr(strtolower($_SERVER["SERVER_PROTOCOL"]), 0, strpos(strtolower($_SERVER["SERVER_PROTOCOL"]), "/")) . $s;
+  $port     = $_SERVER['SERVER_PORT'];
+  $port     = ( ( ! $ssl && $port=='80' ) || ( $ssl && $port=='443' ) ) ? '' : ':'.$port;
+  $len = strlen($_SERVER["DOCUMENT_ROOT"]);
+  $uri = $_SERVER["REQUEST_URI"];
+  for ($i =0; $i < $up; $i++) {
+    $uri = dirname($uri);
+  }
+  return $protocol . "://" . $_SERVER['SERVER_NAME'] . $port . $uri;
+}
+
 function getheader($name) {
   $upper = str_replace('-', '_', strtoupper($name));
   if (isset($_SERVER['HTTP_'.$upper]) && $_SERVER['HTTP_'.$upper] != null) {
@@ -48,8 +64,7 @@ function auth_verify() {
   $authentication = explode(' ', $jwt, 2);
   if ($authentication == null || !isset($authentication[0]) || !isset($authentication[1]) || strtolower($authentication[0]) != 'bearer') {
     $m = 'Value of Authorization header should start with Bearer and should be followed by authorization key, token but it is not.';
-    $errid = base64(randomstr(32));
-    return array('error'=>$m, 'errid'=>$errid);
+    http_exit(401, $m, null, null);
   }
   $jwt = $authentication[1]; $authentication = null;
 
@@ -64,7 +79,7 @@ function auth_verify() {
     return array('user'=>$jwt);
   } else {
     $m = "Invalid authentication id specified: $jwt";
-    return array('error'=>$m, 'errid'=>$errid);
+    http_exit(401, $m, null, null);
   }
 }
 
@@ -76,21 +91,17 @@ function http_exit($code, $msg, $internal, $fileid) {
     http_response_code($code);
     $internal = $internal == null ? $msg : $internal;
     error_log($internal.'; Error ID: '.$errid.'; File Id: '.$fileid);
-    $msg = $msg.'; Error ID: '.$errid;
     header('Content-Type: application/json');
     header('X-Max-Length-Supported: '.$maxsizesupported);
     header('X-Error-Id: '.$errid);
-    $obj = array("code"=>$code, "message"=>$msg, 'errid'=>$errid);
+    header('X-File-Id: '.$fileid);
+    $obj = array("code"=>$code, "message"=>$msg, 'errid'=>$errid, 'fileid'=>$fileid);
     echo json_encode($obj, $json_encode_props)."\n";
     exit(0);
 }
 
 function rest() {
   $method = isset($_SERVER["REQUEST_METHOD"]) ? $_SERVER["REQUEST_METHOD"] : "";
-  $user = auth_verify();
-  if (!isset($user['user'])) {
-    http_exit(401, $user['error']." - ".$user['errid']);
-  }
   if ($method == "GET") {
     get();
   } else if ($method == "POST") {

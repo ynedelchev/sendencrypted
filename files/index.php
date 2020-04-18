@@ -3,13 +3,13 @@ require_once("common.php");
 $json_encode_props = JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PARTIAL_OUTPUT_ON_ERROR;
 
 function get() {
-  global $json_encode_props;
-  $obj = array('status'=>'unsupported', 'message'=>'Unsupported operation : method GET. Use method POST instead.');
-  echo json_encode($obj, $json_encode_props)."\n";
+    header("Location: ".full_url(1).'/', true, 301); 
+    exit(0);
 }
 
 function post() {
     global $maxsizesupported, $json_encode_props;
+    $user = auth_verify();
     $size = getheader('Content-Length');
       if ( isset($size)) {
       $size = intval($size);
