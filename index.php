@@ -582,16 +582,7 @@ promise.then(function (result) {
 <link rel="stylesheet" type="text/css" href="general.css">
 </head>
 <body onload="onpageload();">
-<!-- Fork Me On Github -->
-<img style="position: absolute; top: 0; right: 0; border: 0;"
-     src="images/fork-me-on-github.png"
-     alt="Fork me on GitHub" usemap="#github">
-  <map name="github">
-    <area shape="poly" coords="12,0,148,138,148,74,74,0,12,0" 
-          href="https://github.com/ynedelchev/sendencrypted" 
-          alt="sendencrypted">
-  </map>
-<!-- Fork Me On Github End -->
+  <?php include("github.php");?>
 
   <div class="main">
     <div class="error" id="error">
@@ -629,6 +620,8 @@ promise.then(function (result) {
     </div>
     <br style="clear: both;"/>
     <output id="list" style="align: left; text-align: left;"></output>
+    <br/><br/>
+    <?php include("thanks.php");?>
   </div>
 </body>
 </html>

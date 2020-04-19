@@ -1,5 +1,11 @@
 <?php
 require_once("common.php");
+function includeThanks($uplevels) {
+    include(dirname(__DIR__)."/thanks.php");
+}
+function includeGitHub($uplevels) {
+    include(dirname(__DIR__)."/github.php");
+}
 function humanSize($size) {
   $merki = array(
     array("one" => "един байт",     "many" => "байта"    ),
@@ -316,14 +322,8 @@ console.log("key1.constructor: " + key1.constructor);
 </script>
 </head>
 <body onload="onpageload();">
-<!-- Fork Me On Github -->
-<img style="position: absolute; top: 0; right: 0; border: 0;"
-     src="<?php echo full_url(2);?>/images/fork-me-on-github.png"
-     alt="Fork me on GitHub" usemap="#github">
-  <map name="github">
-    <area shape="poly" coords="12,0,148,138,148,74,74,0,12,0" href="https://github.com/ynedelchev/sendencrypted" alt="sendencrypted">
-  </map>
-<!-- Fork Me On Github End -->
+  <?php includeGitHub(2);?>
+ 
   <div class="main">
     <div class="error" id="error">
      Вашият браузър не се поддържа. Моля пробвайта с друг браузър като например Мозила Файърфокс.
@@ -357,6 +357,8 @@ console.log("key1.constructor: " + key1.constructor);
     <div style="align: left; padding-top: 1em; margin-bottom: 2em;">
         <input type="button" id="send" name="send" class="crypt" style="width: 20em;" value="Криптиране и изпращане на файл" onclick="javascript:send();"/>
     </div>
+    <?php includeThanks(2);?>
+ </div>
 
 </body>
 </html>

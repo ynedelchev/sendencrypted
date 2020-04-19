@@ -12,3 +12,5 @@ curl:
 	curl -kv -X POST -H "Authorization: Bearer test"  -H "Content-Type: text/plain" https://localhost/sendencrypted/files -d '1234567890bcdefghijkBCDEFHIJK'
 get: 
 	curl -kv -X GET -H "Authorization: Bearer test"  -H "Content-Type: text/plain" https://localhost/sendencrypted/files/dlV2cH4zSXtrQGd3Jm1SRHJoPTJmXnl9UnxuPFVvTUs=
+del: 
+	curl -kv -X DELETE -H "Authorization: Bearer test" https://localhost/sendencrypted/files?filter=expired
